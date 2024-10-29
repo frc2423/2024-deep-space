@@ -2,9 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.subsystems.swervedrive;
-
-import static frc.robot.Constants.Vision.kRobotToCam;
+package frc.robot.subsystems;
 
 import java.io.File;
 import java.util.List;
@@ -49,13 +47,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.DAS;
-import frc.robot.NTHelper;
 import frc.robot.PoseTransformUtils;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
 import frc.robot.Constants.Drivebase;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.Constants.Vision;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
 import swervelib.math.SwerveMath;
@@ -67,8 +64,6 @@ import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 
 public class SwerveSubsystem extends SubsystemBase {
 
-  private Optional<Pose2d> autoRotationTarget = Optional.empty();
-  private Rotation2d autoRotationTargetOffset = Rotation2d.fromDegrees(0);
   XboxController driverXbox = new XboxController(0);
 
   private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
@@ -171,8 +166,6 @@ public class SwerveSubsystem extends SubsystemBase {
         },
         this // Reference to this subsystem to set requirements
     );
-
-    PPHolonomicDriveController.setRotationTargetOverride(this::getRotationTargetOverride);
   }
 
   public Command getTeleopDriveCommand(){
@@ -214,25 +207,6 @@ public class SwerveSubsystem extends SubsystemBase {
           return alliance.isPresent() && alliance.get() == Alliance.Red;
         }, //
         this);
-  }
-
-  public void setAutoRotationTarget(Pose2d pose) {
-    setAutoRotationTarget(pose, Rotation2d.fromDegrees(0));
-  }
-
-  public void setAutoRotationTarget(Pose2d pose, Rotation2d offset) {
-    autoRotationTarget = pose == null ? Optional.empty() : Optional.of(pose);
-    autoRotationTargetOffset = offset;
-  }
-
-  public Optional<Rotation2d> getRotationTargetOverride() {
-    // Some condition that should decide if we want to override rotation
-    if (autoRotationTarget.isEmpty()) {
-      return Optional.empty();
-    }
-    Pose2d transformedPose = PoseTransformUtils.transformXRedPose(autoRotationTarget.get());
-    Rotation2d angle = getLookAngle(transformedPose).plus(autoRotationTargetOffset);
-    return Optional.of(angle);
   }
 
   /**
@@ -417,7 +391,6 @@ public class SwerveSubsystem extends SubsystemBase {
    * @param initialHolonomicPose The pose to set the odometry to
    */
   public void resetOdometry(Pose2d initialHolonomicPose) {
-    System.out.println("RESET ODOMETRY!!!");
     swerveDrive.resetOdometry(initialHolonomicPose);
   }
 
@@ -437,7 +410,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
   public Pose3d getCameraPose() {
     Pose3d cameraPose3d = new Pose3d(getPose());
-    cameraPose3d = cameraPose3d.plus(kRobotToCam);
+    cameraPose3d = cameraPose3d.plus(Vision.kRobotToCam);
     return cameraPose3d;
   }
 
@@ -629,56 +602,9 @@ public class SwerveSubsystem extends SubsystemBase {
 
   @Override
   public void initSendable(SendableBuilder builder) {
-    // This is used to add things to NetworkTables
-    super.initSendable(builder);
-    builder.addDoubleProperty("Distance", () -> getDistanceToSpeaker(), null);
-    builder.addDoubleProperty("Front Left Speed", () -> swerveDrive.getStates()[0].speedMetersPerSecond, null);
-    builder.addDoubleArrayProperty("Get Camera Pose3d", () -> NTHelper.getDoubleArrayPose3d(getCameraPose()), null);
-    builder.addDoubleArrayProperty("autoRotationTarget", () -> {
-      if (autoRotationTarget.isEmpty()) {
-        return new double[] {};
-      } else {
-        return NTHelper.getDoubleArrayPose2d(autoRotationTarget.get());
-      }
-    }, null);
+   
   }
 
-  public void setSlowMaxSpeed() {
-    maximumSpeed = 2;
-  }
-
-  public void setHighMaxSpeed() {
-    maximumSpeed = 4.5;
-  }
-
-  public double getDistanceToSpeaker() {
-    return getDistanceToSpeaker(this.getPose());
-  }
-
-  public double getDistanceToSpeaker(Pose2d pose) {
-
-    String usingThis = NTHelper.getString("/SmartDashboard/Shooter/usingThis", "vision");
-
-    if (usingThis.equals("vision")) {
-      Pose2d transformedPose = PoseTransformUtils.transformXRedPose(Constants.autoAlign.speakerLocationPose);
-
-      Transform2d diffPose = pose.minus(transformedPose);
-
-      double ydistance = diffPose.getY();
-      double xdistance = diffPose.getX();
-      double distance = Math.sqrt(Math.pow(ydistance, 2) + Math.pow(xdistance, 2));
-
-      return (distance);
-
-    } else if (usingThis.equals("autoAlign")) {
-      double distance = 1.66;
-      return distance;
-
-    } else {
-      double distance = 1.318;
-      return distance;
-    }
-  }
 
   public double getDistanceBetweenPoses(Pose2d a, Pose2d b) {
     double y = a.getY() - b.getY();
@@ -686,61 +612,9 @@ public class SwerveSubsystem extends SubsystemBase {
     return Math.sqrt(Math.pow(y, 2) + Math.pow(x, 2));
   }
 
-  public Rotation2d getLookAngle(Pose2d targetPose) {
-    Pose2d currentPose = this.getPose();
-    double distance = getDistanceBetweenPoses(currentPose, targetPose);
-    if (distance < Units.inchesToMeters(8)) {
-      return currentPose.getRotation();
-    }
-    double angleRads = Math.atan2(targetPose.getY() - currentPose.getY(), targetPose.getX() - currentPose.getX());
-    return new Rotation2d(angleRads);
-  }
-
-  public void actuallyLookAngle(Rotation2d rotation2d) {
-    ChassisSpeeds desiredSpeeds = this.getTargetSpeeds(0.0, 0.0,
-        rotation2d);
-    double maxRadsPerSecond = 2.5;
-    // Make the robot move
-    if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond) {
-      desiredSpeeds.omegaRadiansPerSecond = Math.copySign(maxRadsPerSecond, desiredSpeeds.omegaRadiansPerSecond);
-    }
-    this.drive(desiredSpeeds);
-  }
-
-  public void actuallyLookAngleButMove(Rotation2d rotation2d) {
-    double x = MathUtil.applyDeadband(
-        -driverXbox.getLeftX(),
-        OperatorConstants.LEFT_X_DEADBAND);
-    if (PoseTransformUtils.isRedAlliance()) {
-      x *= -1;
-    }
-    double ySpeedTarget = m_xspeedLimiter.calculate(x);
-
-    double y = MathUtil.applyDeadband(
-        -driverXbox.getLeftY(),
-        OperatorConstants.LEFT_Y_DEADBAND);
-    if (PoseTransformUtils.isRedAlliance()) {
-      y *= -1;
-    }
-    double xSpeedTarget = m_yspeedLimiter.calculate(y);
-
-    ChassisSpeeds desiredSpeeds = this.getTargetSpeeds(xSpeedTarget, ySpeedTarget,
-        rotation2d);
-    double maxRadsPerSecond = 10000; // 2.5
-    // Make the robot move
-    if (Math.abs(desiredSpeeds.omegaRadiansPerSecond) > maxRadsPerSecond) {
-      desiredSpeeds.omegaRadiansPerSecond = Math.copySign(maxRadsPerSecond, desiredSpeeds.omegaRadiansPerSecond);
-    }
-    this.driveFieldOriented(desiredSpeeds);
-  }
-
   public void turn(double speed) {
     ChassisSpeeds speeds = new ChassisSpeeds(0, 0, speed);
     drive(speeds);
   }
 
-  public void turnAndGo(double x, double turn) {
-    ChassisSpeeds speeds = new ChassisSpeeds(x, 0, turn);
-    drive(speeds);
-  }
 }
