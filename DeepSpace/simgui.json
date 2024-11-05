@@ -1,0 +1,27 @@
+{
+  "NTProvider": {
+    "types": {
+      "/FMSInfo": "FMSInfo",
+      "/Shuffleboard/Autonomous/SendableChooser[0]": "String Chooser",
+      "/SmartDashboard/Field": "Field2d",
+      "/SmartDashboard/navX-Sensor[4]": "Gyro"
+    },
+    "windows": {
+      "/SmartDashboard/Field": {
+        "bottom": 615,
+        "builtin": "2019 Destination: Deep Space",
+        "height": 8.229599952697754,
+        "left": 217,
+        "right": 1372,
+        "top": 40,
+        "width": 16.459199905395508,
+        "window": {
+          "visible": true
+        }
+      }
+    }
+  },
+  "NetworkTables Info": {
+    "visible": true
+  }
+}
