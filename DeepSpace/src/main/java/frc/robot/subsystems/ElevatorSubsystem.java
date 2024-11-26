@@ -1,3 +1,6 @@
+package frc.robot.subsystems;
+
+
 import com.revrobotics.CANSparkFlex;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkLowLevel.MotorType;
@@ -10,6 +13,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.wpilibj.smartdashboard.Mechanism2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismLigament2d;
+import edu.wpi.first.wpilibj.smartdashboard.MechanismRoot2d;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.util.Color;
+import edu.wpi.first.wpilibj.util.Color8Bit;
 
 public class ElevatorSubsystem extends SubsystemBase {
     ProfiledPIDController elevator_PID = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0));// noice
@@ -22,19 +31,34 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double highestPoint = 5.4;
     private double lowestPoint = 0;
 
+    private final MechanismLigament2d elevator;
+    private final MechanismLigament2d bottom;
+
 
 
     public ElevatorSubsystem() {
-        
+    // the main mechanism object
+        Mechanism2d mech = new Mechanism2d(3, 3);
+    // the mechanism root node
+        MechanismRoot2d root = mech.getRoot("bottom", 2, 0);
+
+    // MechanismLigament2d objects represent each "section"/"stage" of the mechanism, and are based
+    // off the root node or another ligament object
+        elevator = root.append(new MechanismLigament2d("elevator", lowestPoint, 90));
+        bottom =
+        elevator.append(
+            new MechanismLigament2d("bottom", 0.5, 90, 6, new Color8Bit(Color.kBlanchedAlmond)));
+
+    // post the mechanism to the dashboard
+        SmartDashboard.putData("Mech2d", mech);
     }
+        
 
     @Override
     public void periodic() {
         double calculatedPID = calculatePid(setpoint);
         motor1.set(calculatedPID);
-        motor2.set(-calculatedPID); //ONE OF THEM IS NEGITIVE
-
-      
+        motor2.set(-calculatedPID); //ONE OF THEM IS NEGITIVE, NICE ONE
 
     }
 
@@ -49,11 +73,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void goUp() { // for manual control
         setpoint = highestPoint;
-
-
     }
 
-    public void goDown() { // for manual control
+    public void goDown() { // for manual control, sicj
         setpoint = lowestPoint;
     }
 
@@ -63,6 +85,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public double getElevatorVelocity() {
         return motor1.getEncoder().getVelocity();
+    }
+
+    public void resetElevatorPosition() {
+        setpoint = 0;
     }
 
 }
