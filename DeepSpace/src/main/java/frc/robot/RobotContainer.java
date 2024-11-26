@@ -16,8 +16,12 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.IntakeSubsystem;
-import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.Intake.IntakeCommands;
+import frc.robot.subsystems.Swerve.SwerveSubsystem;
+import frc.robot.subsystems.Claw.ClawSubsystem;
+import frc.robot.subsystems.Claw.ClawCommands;
+
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -34,6 +38,9 @@ public class RobotContainer {
   private final SwerveSubsystem drivebase = new SwerveSubsystem(
       new File(Filesystem.getDeployDirectory(), deployDirectory));
   IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
+  ClawSubsystem clawSubsystem = new ClawSubsystem();
+  ClawCommands clawCommands = new ClawCommands(clawSubsystem);
 
   private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
   private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(7);
@@ -90,10 +97,19 @@ public class RobotContainer {
         .onTrue((new InstantCommand(drivebase::zeroGyro)));
 
     new JoystickButton(driverXbox, XboxController.Button.kY.value)
-        .whileTrue(intakeSubsystem.intakeIn());
+        .whileTrue(intakeCommands.intakeIn());
 
     new JoystickButton(driverXbox, XboxController.Button.kX.value)
-        .whileTrue(intakeSubsystem.intakeOut());
+        .whileTrue(intakeCommands.intakeOut());
+    
+    new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
+        .whileTrue(intakeCommands.intakeStop());
+
+    new JoystickButton(driverXbox, XboxController.Button.kA.value)
+        .whileTrue(clawCommands.clawRelease());
+
+    new JoystickButton(driverXbox, XboxController.Button.kB.value)
+        .whileTrue(clawCommands.clawStop());
 
   }
 
