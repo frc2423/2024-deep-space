@@ -9,6 +9,8 @@ import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Robot;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -40,14 +42,14 @@ public class ElevatorSubsystem extends SubsystemBase {
     // the main mechanism object
         Mechanism2d mech = new Mechanism2d(3, 3);
     // the mechanism root node
-        MechanismRoot2d root = mech.getRoot("bottom", 2, 0);
+        MechanismRoot2d root = mech.getRoot("bottom", 2, 2);
 
     // MechanismLigament2d objects represent each "section"/"stage" of the mechanism, and are based
     // off the root node or another ligament object
         elevator = root.append(new MechanismLigament2d("elevator", lowestPoint, 90));
         bottom =
         elevator.append(
-            new MechanismLigament2d("bottom", 0.5, 90, 6, new Color8Bit(Color.kBlanchedAlmond)));
+            new MechanismLigament2d("bottom", 0.5, 180, 6, new Color8Bit(Color.kBlanchedAlmond)));
 
     // post the mechanism to the dashboard
         SmartDashboard.putData("Mech2d", mech);
@@ -75,8 +77,10 @@ public class ElevatorSubsystem extends SubsystemBase {
         setpoint = highestPoint;
     }
 
-    public void goDown() { // for manual control, sicj
-        setpoint = lowestPoint;
+    public Command goDown() { // for manual control, sick
+        return runOnce(()-> {
+            setpoint = lowestPoint;
+        } );
     }
 
     public void stopElevator() {
@@ -90,5 +94,4 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void resetElevatorPosition() {
         setpoint = 0;
     }
-
 }
