@@ -93,6 +93,12 @@ public class RobotContainer {
   private void configureBindings() {
     new JoystickButton(driverXbox, XboxController.Button.kStart.value)
         .onTrue((new InstantCommand(drivebase::zeroGyro)));
+
+    new JoystickButton(driverXbox, XboxController.Button.kA.value)
+        .onTrue(elevator.goDown());
+
+    new JoystickButton(driverXbox, XboxController.Button.kY.value)
+        .onTrue(elevator.goUp());
   }
 
    
