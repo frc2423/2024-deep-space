@@ -37,9 +37,9 @@ public class ElevatorSubsystem extends SubsystemBase {
     private ElevatorSim elevatorSim = new ElevatorSim();
 
     // the main mechanism object
-    private Mechanism2d mech = new Mechanism2d(3, 3);
+    private Mechanism2d mech = new Mechanism2d(10, 100);
     // the mechanism root node
-    private MechanismRoot2d root = mech.getRoot("bottom", 1.55, 0);
+    private MechanismRoot2d root = mech.getRoot("bottom", 5, 0);
 
     //private final FlywheelSim elevatorSimMotor = new FlywheelSim(DCMotor.getNEO(1), 150.0 / 7.0, 0.004096955);
 
@@ -48,7 +48,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     // off the root node or another ligament object
     MechanismLigament2d elevator = root.append(new MechanismLigament2d("elevator", lowestPoint, 90));
     MechanismLigament2d bottom = elevator.append(
-            new MechanismLigament2d("bottom", 5, 180, 6, new Color8Bit(Color.kBlanchedAlmond)));
+            new MechanismLigament2d("bottom", 5, 0, 6, new Color8Bit(Color.kBlanchedAlmond)));
 
     public ElevatorSubsystem() {
 
@@ -65,7 +65,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         if (Robot.isSimulation()) {
             elevatorSim.periodic();
+            elevator.setLength(50);
             bottom.setLength(elevatorSim.getHeight());
+            //System.out.println(elevatorSim.getHeight());
         }
     }
 

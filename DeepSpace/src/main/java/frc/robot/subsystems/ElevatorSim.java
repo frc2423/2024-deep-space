@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 import java.util.Date;
 public class ElevatorSim {
+    double initialHeight = 100;
     double height = 0;
     double voltage = 0;
     Date updateTime = new Date();
@@ -23,7 +24,12 @@ public class ElevatorSim {
         }
         
         else if (voltage == 0) {
-            height = (0.5*9.8)*Math.pow(deltaT,2) ;
+            if (height < 0) {
+                height = initialHeight -(0.5*9.8)*Math.pow(deltaT/1000,2);
+                System.out.println(height);
+                System.out.println(deltaT / 1000);
+            }
+            //height = -(0.5*9.8)*Math.pow(deltaT/1000,2);
         }
 
         else {
