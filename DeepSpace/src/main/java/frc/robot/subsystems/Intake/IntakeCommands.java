@@ -12,12 +12,12 @@ public class IntakeCommands {
         this.intake = intake;
     }
     public Command intakeIn() {
-        var command = Commands.run(() -> intake.intake(0.5));
+        var command = Commands.run(() -> intake.intake(0.05));
         command.setName("Intake In");
         return command;
 }
     public Command intakeOut() {
-        var command = Commands.run(() -> intake.outtake(-0.5));
+        var command = Commands.run(() -> intake.outtake(-0.05));
         command.setName("Intake Out");
         return command;
 }
