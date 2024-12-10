@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -62,6 +63,8 @@ public class RobotContainer {
     // Put the chooser on the dashboard
     Shuffleboard.getTab("Autonomous").add(m_chooser);
 
+    SmartDashboard.putData("intake", intakeSubsystem);
+
     Command driveFieldOrientedAngularVelocity = getTeleopDriveCommand();
 
     drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
@@ -97,7 +100,7 @@ public class RobotContainer {
         .onTrue((new InstantCommand(drivebase::zeroGyro)));
 
     new JoystickButton(driverXbox, XboxController.Button.kY.value)
-        .whileTrue(intakeCommands.intakeIn());
+        .onTrue(intakeCommands.intakeIn());
 
     new JoystickButton(driverXbox, XboxController.Button.kX.value)
         .whileTrue(intakeCommands.intakeOut());
