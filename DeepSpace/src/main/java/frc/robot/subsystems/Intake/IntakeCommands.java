@@ -13,8 +13,8 @@ public class IntakeCommands {
 
     public Command intakeIn() {
         var command = Commands.run(() -> {
-            if (intake.distMm() > 1) {
-                intake.intake(0.1);
+            if (intake.distMm() > 5) {
+                intake.intake(0.3);
             } else {
                 intake.stop();
             }
