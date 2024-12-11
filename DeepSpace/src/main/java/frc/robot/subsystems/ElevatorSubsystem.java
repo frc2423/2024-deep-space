@@ -30,9 +30,9 @@ public class ElevatorSubsystem extends SubsystemBase {
     private double setpoint = 0;
     private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0, 0, 0, 0);
     private CANSparkFlex motor1 = new CANSparkFlex(24, MotorType.kBrushless);
-    private CANSparkFlex motor2 = new CANSparkFlex(26, MotorType.kBrushless);
-    private double highestPoint = 5.4;
-    private double lowestPoint = 0;
+    private CANSparkFlex motor2 = new CANSparkFlex(26, MotorType.kBrushless); //what up ben
+    private double highestPoint = 1.7;
+    private double lowestPoint = 0.1;
 
     private ElevatorSim elevatorSim = new ElevatorSim();
 
@@ -75,6 +75,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         // updatePivotAngle();
         double pid = elevator_PID.calculate(elevatorCurrentPose, position);
         var setpoint = elevator_PID.getSetpoint();
+        
         double feedforward = m_feedforward.calculate(1, 2);
         // return feedforward + pid;
         return (feedforward + pid) / RobotController.getBatteryVoltage();
@@ -91,6 +92,15 @@ public class ElevatorSubsystem extends SubsystemBase {
             setpoint = highestPoint;
         });
     }
+
+    public Command goToSetpoint(double position) {
+        return runOnce(() -> {
+            setpoint = position;
+        }
+        
+        );
+    }
+    
 
     public Command stopElevator() { // for manual control, sick
         return runOnce(() -> {

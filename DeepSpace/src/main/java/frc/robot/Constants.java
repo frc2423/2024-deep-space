@@ -63,4 +63,17 @@ public final class Constants {
     public static final double RIGHT_X_DEADBAND = 0.1;
     public static final double TURN_CONSTANT = 0.75;
   }
+
+  public static class SetpointConstants {
+
+    public static final double ROCKET_BOTTOM_PANEL = 0.5;
+    public static final double ROCKET_MIDDLE_PANEL = 1.15;
+    public static final double ROCKET_TOP_PANEL = 2;
+
+    public static final double ROCKET_BOTTOM_BALLZ = 0.5;
+    public static final double ROCKET_MIDDLE_BALLZ = 1.15;
+    public static final double ROCKET_TOP_BALLZ = 2;
+
+
+  }
 }

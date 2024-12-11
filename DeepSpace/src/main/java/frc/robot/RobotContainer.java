@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.ElevatorSubsystem;
 import frc.robot.subsystems.SwerveSubsystem;
@@ -44,8 +45,9 @@ public class RobotContainer {
   // A chooser for autonomous commands
   SendableChooser<String> m_chooser = new SendableChooser<>();
 
-  XboxController driverXbox = new XboxController(0);
-  XboxController operator = new XboxController(1);
+  XboxController driverXbox = new XboxController(0); //BAZINFA
+  XboxController operator = new XboxController(1);//hi :-)
+  boolean isPanel = false;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -94,11 +96,17 @@ public class RobotContainer {
     new JoystickButton(driverXbox, XboxController.Button.kStart.value)
         .onTrue((new InstantCommand(drivebase::zeroGyro)));
 
-    new JoystickButton(driverXbox, XboxController.Button.kA.value)
-        .onTrue(elevator.goDown());
+    // new JoystickButton(driverXbox, XboxController.Button.kA.value)
+    //     .onTrue(elevator.goDown());
 
-    new JoystickButton(driverXbox, XboxController.Button.kY.value)
-        .onTrue(elevator.goUp());
+    // new JoystickButton(driverXbox, XboxController.Button.kY.value)
+    //     .onTrue(elevator.goUp());
+    new Trigger(() -> operator.getPOV() == 270).whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ROCKET_BOTTOM_PANEL : Constants.SetpointConstants.ROCKET_BOTTOM_BALLZ));
+    new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ROCKET_MIDDLE_PANEL : Constants.SetpointConstants.ROCKET_MIDDLE_BALLZ));
+    new Trigger(() -> operator.getPOV() == 90).whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ROCKET_TOP_PANEL : Constants.SetpointConstants.ROCKET_TOP_PANEL));
+    // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
+
+    
   }
 
    
