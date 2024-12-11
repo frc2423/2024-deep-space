@@ -37,9 +37,9 @@ public class ElevatorSubsystem extends SubsystemBase {
     private ElevatorSim elevatorSim = new ElevatorSim();
 
     // the main mechanism object
-    private Mechanism2d mech = new Mechanism2d(10, 100);
+    private Mechanism2d mech = new Mechanism2d(40, 100);
     // the mechanism root node
-    private MechanismRoot2d root = mech.getRoot("bottom", 5, 0);
+    private MechanismRoot2d root = mech.getRoot("bottom", 20.5, 0);
 
     //private final FlywheelSim elevatorSimMotor = new FlywheelSim(DCMotor.getNEO(1), 150.0 / 7.0, 0.004096955);
 
@@ -89,6 +89,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public Command goUp() { // for manual control, sick
         return runOnce(() -> {
             setpoint = highestPoint;
+            elevatorSim.setVoltage(1);
         });
     }
 

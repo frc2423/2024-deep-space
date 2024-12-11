@@ -14,10 +14,12 @@ import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.ElevatorSubsystem;
+import frc.robot.subsystems.ElevatorSim;
 import frc.robot.subsystems.SwerveSubsystem;
 
 
@@ -37,6 +39,7 @@ public class RobotContainer {
       new File(Filesystem.getDeployDirectory(), deployDirectory));
 
   public static ElevatorSubsystem elevator = new ElevatorSubsystem();
+  public static ElevatorSim elevatorSim = new ElevatorSim();
 
   private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
   private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(7);
