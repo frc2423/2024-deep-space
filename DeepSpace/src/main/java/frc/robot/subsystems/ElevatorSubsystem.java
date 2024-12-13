@@ -7,10 +7,12 @@ import com.revrobotics.CANSparkLowLevel.MotorType;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.util.sendable.SendableBuilder;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.NTHelper;
 import frc.robot.Robot;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -23,15 +25,15 @@ import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
 public class ElevatorSubsystem extends SubsystemBase {
-    ProfiledPIDController elevator_PID = new ProfiledPIDController(0, 0, 0, new TrapezoidProfile.Constraints(0, 0));// noice
-    ProfiledPIDController elevator_PID_Manual = new ProfiledPIDController(0, 0, 0,
-            new TrapezoidProfile.Constraints(0, 0));// for the goUp and goDown for manual (slower maxVel)
+    private double maxVel = .05;
+    private double maxAccel = .1;
+    ProfiledPIDController elevator_PID = new ProfiledPIDController(0.1, 0, 0, new TrapezoidProfile.Constraints(0, 0));// noice
     private double elevatorCurrentPose = 0;
     private double setpoint = 0;
-    private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0, 0, 0, 0);
+    private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0.07, 0.18, 0, 0);
     private CANSparkFlex motor1 = new CANSparkFlex(24, MotorType.kBrushless);
-    private CANSparkFlex motor2 = new CANSparkFlex(26, MotorType.kBrushless); //what up ben
-    private double highestPoint = 1.7;
+    private CANSparkFlex motor2 = new CANSparkFlex(26, MotorType.kBrushless);
+    private double highestPoint = 40;
     private double lowestPoint = 0.1;
 
     private ElevatorSim elevatorSim = new ElevatorSim();
@@ -52,6 +54,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public ElevatorSubsystem() {
 
+        motor1.getEncoder().setPosition(0);
+        motor2.getEncoder().setPosition(0);
+        
         // post the mechanism to the dashboard
         SmartDashboard.putData("Mech2d", mech);
         //elevatorSimMotor.setInput(0);
@@ -61,7 +66,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     public void periodic() {
         double calculatedPID = calculatePid(setpoint);
         motor1.set(calculatedPID);
-        motor2.set(-calculatedPID); // ONE OF THEM IS NEGITIVE, NICE O
+        motor2.set(-calculatedPID); // ONE OF THEM IS NEGITIVE, NICE :O
 
         if (Robot.isSimulation()) {
             elevatorSim.periodic();
@@ -73,12 +78,13 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     private double calculatePid(double position) {
         // updatePivotAngle();
+        elevatorCurrentPose = motor1.getEncoder().getPosition();
         double pid = elevator_PID.calculate(elevatorCurrentPose, position);
         var setpoint = elevator_PID.getSetpoint();
         
-        double feedforward = m_feedforward.calculate(1, 2);
+        double feedforward = m_feedforward.calculate(setpoint.velocity, 0);
         // return feedforward + pid;
-        return (feedforward + pid) / RobotController.getBatteryVoltage();
+        return (feedforward + pid) / RobotController.getBatteryVoltage(); //+pid
     }
 
     public Command goDown() { // for manual control, sick
@@ -87,7 +93,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         });
     }
 
-    public Command goUp() { // for manual control, sick
+    public Command goUp() {
+        // for manual control, sick
         return runOnce(() -> {
             setpoint = highestPoint;
         });
@@ -125,4 +132,22 @@ public class ElevatorSubsystem extends SubsystemBase {
     //public double getHeightSim() {
 
     //}
+
+     @Override
+    public void initSendable(SendableBuilder builder) {
+        // This is used to add things to NetworkTables
+        super.initSendable(builder);
+
+        builder.addDoubleProperty("calculatePid", ( ) -> calculatePid(setpoint), null);
+        builder.addDoubleProperty("elevatorCurrentPose", () -> elevatorCurrentPose, null);
+        builder.addDoubleProperty("setpoint", () -> setpoint, null);
+
+        //builder.addBooleanProperty("PIDMode", () -> isPidMode, null);
+        //builder.addBooleanProperty("ShooterOn", () -> shooterOn, null);
+
+        // builder.addDoubleProperty("shooterMotor1Value", shooterMotorOne::getValue,
+        // null);
+        // builder.addDoubleProperty("shooterMotor2Value", shooterMotorTwo::getValue,
+        // null);
+    }
 }

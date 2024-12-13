@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.simulation.XboxControllerSim;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -64,7 +65,7 @@ public class RobotContainer {
 
     drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
 
-  
+    SmartDashboard.putData("Elevator", elevator);
   }
 
   private Command getTeleopDriveCommand() {
@@ -96,14 +97,14 @@ public class RobotContainer {
     new JoystickButton(driverXbox, XboxController.Button.kStart.value)
         .onTrue((new InstantCommand(drivebase::zeroGyro)));
 
-    // new JoystickButton(driverXbox, XboxController.Button.kA.value)
-    //     .onTrue(elevator.goDown());
+    new JoystickButton(driverXbox, XboxController.Button.kA.value)
+         .onTrue(elevator.goDown());
 
-    // new JoystickButton(driverXbox, XboxController.Button.kY.value)
-    //     .onTrue(elevator.goUp());
+     new JoystickButton(driverXbox, XboxController.Button.kY.value)
+         .onTrue(elevator.goUp());
     new Trigger(() -> operator.getPOV() == 270).whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ROCKET_BOTTOM_PANEL : Constants.SetpointConstants.ROCKET_BOTTOM_BALLZ));
     new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ROCKET_MIDDLE_PANEL : Constants.SetpointConstants.ROCKET_MIDDLE_BALLZ));
-    new Trigger(() -> operator.getPOV() == 90).whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ROCKET_TOP_PANEL : Constants.SetpointConstants.ROCKET_TOP_PANEL));
+    new Trigger(() -> operator.getPOV() == 90).whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ROCKET_TOP_PANEL : Constants.SetpointConstants.ROCKET_TOP_BALLZ));
     // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
 
     
