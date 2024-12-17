@@ -20,7 +20,11 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.subsystems.ElevatorSubsystem;
-import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.Intake.IntakeCommands;
+import frc.robot.subsystems.Swerve.SwerveSubsystem;
+import frc.robot.subsystems.Claw.ClawSubsystem;
+import frc.robot.subsystems.Claw.ClawCommands;
 
 
 /**
@@ -37,6 +41,10 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase = new SwerveSubsystem(
       new File(Filesystem.getDeployDirectory(), deployDirectory));
+  IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
+  ClawSubsystem clawSubsystem = new ClawSubsystem();
+  ClawCommands clawCommands = new ClawCommands(clawSubsystem);
 
   public static ElevatorSubsystem elevator = new ElevatorSubsystem();
 
@@ -54,12 +62,14 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+
     // Configure the trigger bindings
     configureBindings();
-    
-    
+
     // Put the chooser on the dashboard
     Shuffleboard.getTab("Autonomous").add(m_chooser);
+
+    SmartDashboard.putData("intake", intakeSubsystem);
 
     Command driveFieldOrientedAngularVelocity = getTeleopDriveCommand();
 
@@ -92,7 +102,6 @@ public class RobotContainer {
     return driveFieldOrientedAngularVelocity;
   }
 
- 
   private void configureBindings() {
     new JoystickButton(driverXbox, XboxController.Button.kStart.value)
         .onTrue((new InstantCommand(drivebase::zeroGyro)));
@@ -108,9 +117,26 @@ public class RobotContainer {
     // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
 
     
-  }
+  
 
    
+    new JoystickButton(driverXbox, XboxController.Button.kY.value)
+        .onTrue(intakeCommands.intakeIn());
+
+    new JoystickButton(driverXbox, XboxController.Button.kX.value)
+        .onTrue(intakeCommands.intakeOut());
+    
+    new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
+        .whileTrue(intakeCommands.intakeStop());
+
+    new JoystickButton(driverXbox, XboxController.Button.kA.value)
+        .whileTrue(clawCommands.clawRelease());
+
+    new JoystickButton(driverXbox, XboxController.Button.kB.value)
+        .whileTrue(clawCommands.clawStop());
+  }
+  
+
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     return drivebase.getAuto(m_chooser.getSelected());
@@ -123,5 +149,6 @@ public class RobotContainer {
   public void zeroGyro() {
     drivebase.zeroGyro();
   }
-
 }
+
+
