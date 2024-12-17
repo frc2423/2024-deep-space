@@ -103,7 +103,7 @@ public class RobotContainer {
         .onTrue(intakeCommands.intakeIn());
 
     new JoystickButton(driverXbox, XboxController.Button.kX.value)
-        .whileTrue(intakeCommands.intakeOut());
+        .onTrue(intakeCommands.intakeOut());
     
     new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
         .whileTrue(intakeCommands.intakeStop());
