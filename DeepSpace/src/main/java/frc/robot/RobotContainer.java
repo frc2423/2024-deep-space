@@ -99,18 +99,18 @@ public class RobotContainer {
           return m_xspeedLimiter.calculate(x);
         },
         () -> -driverXbox.getRightX());
-    return driveFieldOrientedAngularVelocity;
+    return driveFieldOrientedAngularVelocity; // :P
   }
 
   private void configureBindings() {
     new JoystickButton(driverXbox, XboxController.Button.kStart.value)
         .onTrue((new InstantCommand(drivebase::zeroGyro)));
 
-    new JoystickButton(driverXbox, XboxController.Button.kA.value)
-         .onTrue(elevator.goDown());
+    // new JoystickButton(driverXbox, XboxController.Button.kA.value)
+    //      .onTrue(elevator.goDown());
 
-     new JoystickButton(driverXbox, XboxController.Button.kY.value)
-         .onTrue(elevator.goUp());
+    //  new JoystickButton(driverXbox, XboxController.Button.kY.value)
+    //      .onTrue(elevator.goUp());
     new Trigger(() -> operator.getPOV() == 270).whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ROCKET_BOTTOM_PANEL : Constants.SetpointConstants.ROCKET_BOTTOM_BALLZ));
     new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ROCKET_MIDDLE_PANEL : Constants.SetpointConstants.ROCKET_MIDDLE_BALLZ));
     new Trigger(() -> operator.getPOV() == 90).whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ROCKET_TOP_PANEL : Constants.SetpointConstants.ROCKET_TOP_BALLZ));
@@ -125,6 +125,12 @@ public class RobotContainer {
 
     new JoystickButton(driverXbox, XboxController.Button.kX.value)
         .onTrue(intakeCommands.intakeOut());
+
+    new JoystickButton(operator, XboxController.Button.kLeftBumper.value)
+        .onTrue(elevator.goLittleUp());
+
+     new JoystickButton(operator, XboxController.Button.kRightBumper.value)
+        .onTrue(elevator.goLittleDown());
     
     new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
         .whileTrue(intakeCommands.intakeStop());
