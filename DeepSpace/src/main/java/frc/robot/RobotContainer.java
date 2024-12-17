@@ -12,11 +12,16 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.Intake.IntakeSubsystem;
+import frc.robot.subsystems.Intake.IntakeCommands;
+import frc.robot.subsystems.Swerve.SwerveSubsystem;
+import frc.robot.subsystems.Claw.ClawSubsystem;
+import frc.robot.subsystems.Claw.ClawCommands;
 
 
 /**
@@ -33,6 +38,10 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem drivebase = new SwerveSubsystem(
       new File(Filesystem.getDeployDirectory(), deployDirectory));
+  IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
+  IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
+  ClawSubsystem clawSubsystem = new ClawSubsystem();
+  ClawCommands clawCommands = new ClawCommands(clawSubsystem);
 
   private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(7);
   private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(7);
@@ -47,18 +56,19 @@ public class RobotContainer {
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+
     // Configure the trigger bindings
     configureBindings();
-    
-    
+
     // Put the chooser on the dashboard
     Shuffleboard.getTab("Autonomous").add(m_chooser);
+
+    SmartDashboard.putData("intake", intakeSubsystem);
 
     Command driveFieldOrientedAngularVelocity = getTeleopDriveCommand();
 
     drivebase.setDefaultCommand(driveFieldOrientedAngularVelocity);
 
-  
   }
 
   private Command getTeleopDriveCommand() {
@@ -85,12 +95,27 @@ public class RobotContainer {
     return driveFieldOrientedAngularVelocity;
   }
 
- 
   private void configureBindings() {
     new JoystickButton(driverXbox, XboxController.Button.kStart.value)
         .onTrue((new InstantCommand(drivebase::zeroGyro)));
+
+    new JoystickButton(driverXbox, XboxController.Button.kY.value)
+        .onTrue(intakeCommands.intakeIn());
+
+    new JoystickButton(driverXbox, XboxController.Button.kX.value)
+        .onTrue(intakeCommands.intakeOut());
+    
+    new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
+        .whileTrue(intakeCommands.intakeStop());
+
+    new JoystickButton(driverXbox, XboxController.Button.kA.value)
+        .whileTrue(clawCommands.clawRelease());
+
+    new JoystickButton(driverXbox, XboxController.Button.kB.value)
+        .whileTrue(clawCommands.clawStop());
+
   }
-   
+
   public Command getAutonomousCommand() {
     // An example command will be run in autonomous
     return drivebase.getAuto(m_chooser.getSelected());
