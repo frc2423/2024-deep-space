@@ -67,13 +67,16 @@ public final class Constants {
   public static class SetpointConstants {
 
     public static final double ROCKET_BOTTOM_PANEL = 0.5;
-    public static final double ROCKET_MIDDLE_PANEL = 1.15;
+    public static final double ROCKET_MIDDLE_PANEL = 10;
     public static final double ROCKET_TOP_PANEL = 2;
 
     public static final double ROCKET_BOTTOM_BALLZ = 0.5;
-    public static final double ROCKET_MIDDLE_BALLZ = 1.15;
-    public static final double ROCKET_TOP_BALLZ = 2;
-
+    public static final double ROCKET_MIDDLE_BALLZ = inchToSetPoint(32);
+    public static final double ROCKET_TOP_BALLZ = inchToSetPoint(60);
 
   }
+  public static double inchToSetPoint(double inches) {
+    return ((10/9.0) * inches) - (80/9.0);
+  }
+  public static final double ROCKET_MIDDLE_INCHES = 8;
 }

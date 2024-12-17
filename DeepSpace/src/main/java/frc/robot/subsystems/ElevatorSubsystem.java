@@ -27,7 +27,7 @@ import edu.wpi.first.wpilibj.util.Color8Bit;
 public class ElevatorSubsystem extends SubsystemBase {
     private double maxVel = .05;
     private double maxAccel = .1;
-    ProfiledPIDController elevator_PID = new ProfiledPIDController(0.1, 0, 0, new TrapezoidProfile.Constraints(0, 0));// noice
+    ProfiledPIDController elevator_PID = new ProfiledPIDController(2, 0, 0, new TrapezoidProfile.Constraints(40, 40));// noice
     private double elevatorCurrentPose = 0;
     private double setpoint = 0;
     private final ElevatorFeedforward m_feedforward = new ElevatorFeedforward(0.07, 0.18, 0, 0);
@@ -56,7 +56,7 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         motor1.getEncoder().setPosition(0);
         motor2.getEncoder().setPosition(0);
-        
+
         // post the mechanism to the dashboard
         SmartDashboard.putData("Mech2d", mech);
         //elevatorSimMotor.setInput(0);
