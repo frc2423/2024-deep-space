@@ -107,7 +107,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         });
     }
 
-      public Command goLittleDown() {
+      public Command goLittleDown(double constant) {
         // for manual control, sick
         return runOnce(() -> {
             setpoint = elevatorCurrentPose - constant;

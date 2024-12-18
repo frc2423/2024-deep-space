@@ -116,15 +116,15 @@ public class RobotContainer {
     new Trigger(() -> operator.getPOV() == 90).whileTrue(elevator.goToSetpoint((isPanel) ? Constants.SetpointConstants.ROCKET_TOP_PANEL : Constants.SetpointConstants.ROCKET_TOP_BALLZ));
     // new Trigger(() -> operator.getPOV() == 0).whileTrue(elevator.goUp());
     new JoystickButton(operator, XboxController.Button.kLeftBumper.value)
-    .onTrue(elevator.goLittleDown());
+    .onTrue(elevator.goLittleDown(1));
     new JoystickButton(operator, XboxController.Button.kRightBumper.value)
-    .onTrue(elevator.goLittleUp());
+    .onTrue(elevator.goLittleUp(1));
    
     new JoystickButton(driverXbox, XboxController.Button.kY.value)
-        .onTrue(intakeCommands.intakeIn(1));
+        .onTrue(intakeCommands.intakeIn());
 
     new JoystickButton(driverXbox, XboxController.Button.kX.value)
-        .onTrue(intakeCommands.intakeOut(1));
+        .onTrue(intakeCommands.intakeOut());
     
     new JoystickButton(driverXbox, XboxController.Button.kRightBumper.value)
         .whileTrue(intakeCommands.intakeStop());
