@@ -23,7 +23,10 @@ public class ElevatorSim{
     public void periodic() {
         if (voltage > 0) {
             //vrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr
-            height+=1;
+            if (height < 100) {
+                height+=20;
+            }
+            voltage = 0;
         }
         
         else if (voltage == 0) {
@@ -31,7 +34,7 @@ public class ElevatorSim{
             double deltaT = timePeriodic.getTime() - updateTime.getTime();
             if (height >= 0) {
                 height = initialHeight -(0.5*9.8)*Math.pow(deltaT/1000,2);
-                System.out.println(height);
+                //System.out.println(height);
                 //System.out.println(deltaT / 1000);
             }
             //height = -(0.5*9.8)*Math.pow(deltaT/1000,2);
