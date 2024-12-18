@@ -42,7 +42,8 @@ public class RobotContainer {
   private final SwerveSubsystem drivebase = new SwerveSubsystem(
       new File(Filesystem.getDeployDirectory(), deployDirectory));
   IntakeSubsystem intakeSubsystem = new IntakeSubsystem();
-  IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem);
+  ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
+  IntakeCommands intakeCommands = new IntakeCommands(intakeSubsystem, elevatorSubsystem);
   ClawSubsystem clawSubsystem = new ClawSubsystem();
   ClawCommands clawCommands = new ClawCommands(clawSubsystem);
 

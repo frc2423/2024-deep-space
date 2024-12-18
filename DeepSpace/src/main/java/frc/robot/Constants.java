@@ -73,6 +73,7 @@ public final class Constants {
     public static final double ROCKET_BOTTOM_BALLZ = 0.5;
     public static final double ROCKET_MIDDLE_BALLZ = inchToSetPoint(60);
     public static final double ROCKET_TOP_BALLZ = inchToSetPoint(60);
+    public static final double STORE_POS = inchToSetPoint(18);
 
   }
   public static double inchToSetPoint(double inches) {
