@@ -140,7 +140,12 @@ public class RobotContainer {
 
     new JoystickButton(driverXbox, XboxController.Button.kB.value)
         .whileTrue(clawCommands.clawStop());
+
+    new Trigger(() -> driverXbox.getLeftTriggerAxis() > .5).whileTrue(intakeCommands.hatchDrop());
+
+    new Trigger(() -> driverXbox.getRightTriggerAxis() > .5).whileTrue(intakeCommands.hatchReset());
   }
+  
   
 
   public Command getAutonomousCommand() {

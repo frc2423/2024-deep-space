@@ -37,4 +37,18 @@ public class IntakeCommands {
         command.setName("Intake Stop");
         return command;
     }
+
+    public Command hatchDrop() {
+        var command = Commands.run(() -> intake.hatchDrop());
+        command.addRequirements(intake);
+        command.setName("Hatch Drop");
+        return command;
+    }
+
+    public Command hatchReset() {
+        var command = Commands.run(() -> intake.hatchReset());
+        command.addRequirements(intake);
+        command.setName("Hatch Reset");
+        return command;
+    }
 }
